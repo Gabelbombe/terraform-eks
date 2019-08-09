@@ -168,27 +168,27 @@ resource "aws_autoscaling_group" "eks-worker-node-autoscaling-group" {
   max_size             = 2
   min_size             = 1
   name                 = "${local.my_name}-asc"
-  vpc_zone_identifier  = ["${var.subnet_ids}"]
+  vpc_zone_identifier  = "${var.subnet_ids}"
 
-  tag = {
+  tag {
     key                 = "Name"
     value               = "${local.my_name}-instance"
     propagate_at_launch = true
   }
 
-  tag = {
+  tag {
     key                 = "Environment"
     value               = "${local.my_env}"
     propagate_at_launch = true
   }
 
-  tag = {
+  tag {
     key                 = "Terraform"
     value               = "true"
     propagate_at_launch = true
   }
 
-  tag = {
+  tag {
     key                 = "kubernetes.io/cluster/${var.eks_cluster_name}"
     value               = "owned"
     propagate_at_launch = true

@@ -66,7 +66,7 @@ resource "aws_dynamodb_table" "product-dynamodb-instance" {
     non_key_attributes = ["price", "title"]
   }
 
-  attribute = [
+  attribute [
     {
       name = "pid"
       type = "S"
