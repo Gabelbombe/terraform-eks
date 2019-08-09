@@ -155,7 +155,7 @@ resource "aws_launch_configuration" "eks-worker-node-launch-configuration" {
   user_data_base64 = "${base64encode(local.eks-worker-node-userdata)}"
 
   # For debugging worker nodes
-  key_name = "kari-sseks-dev-worker-node-key"
+  key_name = "kari-gabelbombe-sandbox-worker-node-key"
 
   lifecycle {
     create_before_destroy = true
