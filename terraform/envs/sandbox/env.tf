@@ -20,7 +20,8 @@ terraform {
     # Ireland.
     region         = "eu-west-1"
     dynamodb_table = "gabelbombe-sandbox-terraform-backend-table" # NOTE: You have to create this DynamoDB manually with LockID primary key.
-    profile        = "GEHC-077"                                   # NOTE: This is AWS account profile, not env! You probably have two accounts: one sandbox (or test) and one prod.
+
+    # profile        = "GEHC-077"                                   # NOTE: This is AWS account profile, not env! You probably have two accounts: one sandbox (or test) and one prod.
   }
 }
 
