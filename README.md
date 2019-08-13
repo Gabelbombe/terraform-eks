@@ -47,43 +47,43 @@ The Simple Server Clojure project is in my [Github account](https://github.com/g
 You can find the [The Simple Server Clojure Docker Image Configuration](https://github.com/gabelbombe/docker/tree/master/demo-images/simple-server/clojure) in my Github account. In the Gihub repository you can find build scripts for building the Docker images used in the Kubernetes deployment for various Kubernetes clusters.
 
 
-# AWS Infrastructure
+### AWS Infrastructure
 
 I'm using Terraform to create the needed AWS infrastructure.
 
-## Terraform State
+### Terraform State
 
 For storing the Terraform state I'm using [S3](https://aws.amazon.com/s3/) [terraform backend](https://www.terraform.io/docs/backends/). See [env.tf](https://github.com/gabelbombe/aws/blob/master/terraform-eks/terraform/envs/dev/env.tf) how to configure a Terraform backend. Basically there is no need to configure a backend in a single-user project but let's do it professionally to demonstrate Terraform best practices as well.
 
-## Terraform Project Structure
+### Terraform Project Structure
 
 I'm using a Terraform structure in which I have environments ([envs](https://github.com/gabelbombe/aws/tree/master/terraform-eks/terraform/envs)) and [modules](https://github.com/gabelbombe/aws/tree/master/terraform-eks/terraform/modules). Environments define the environments and they reuse the entities defined in the modules directory. Environment basically just injects the environment related variables to [env-def](https://github.com/gabelbombe/aws/tree/master/terraform-eks/terraform/modules/env-def) which defines the actual modules to build the cloud infra.
 
-## AWS Resources
+### AWS Resources
 
-### DynamoDB Tables
+#### DynamoDB Tables
 
 I created module [dynamodb-tables](https://github.com/gabelbombe/aws/tree/master/terraform-eks/terraform/modules/dynamodb-tables) to isolate the creation of the needed DynamoDB tables. This module uses module [dynamodb](https://github.com/gabelbombe/aws/tree/master/terraform-eks/terraform/modules/dynamodb) to create all other tables except the product table which is a bit different with its global index and is therefore created separately.
 
-### VPC and Subnets
+#### VPC and Subnets
 
 It was a bit of a suprise that you need that much VPC stuff (compared to Azure side). Possibly you necessarily don't need all these VPCs and subnets (if you just want to use the default VPC) but I thought it is better to stick with the working example as much as possible. I downgraded the VPC address space from the exampe - I thought that 65.000 addresses for a Kubernetes cluster is a bit of an overkill.
 
-### EKS
+#### EKS
 
 I was a bit surprised how much infra code there is using Terraform's [AWS EKS Introduction](https://learn.hashicorp.com/terraform/aws/eks-intro). I mainly used the example provided in [eks-cluster.tf](https://github.com/terraform-providers/terraform-provider-aws/blob/master/examples/eks-getting-started/eks-cluster.tf) with some of my own conventions.
 
 Because there was quite a lot of infra code I also managed to screw the infra a bit. So, if you are using that example as your baseline read very carefully all tags, security group references, why cluster name is defined first etc. You can read about my tumbling in chapter "Debugging Why the First Attempt to Create EKS Failed" below.
 
 
-### ECR
+#### ECR
 
 Elastic Container Registry is needed to host the Docker images that Kubernetes deployments use.
 
 ECR repository infra code is extremely simple. I created an ecr-repositories module to abstract the ecr stuff so that I can import only one module in the main env-def environment definition. I create the three ecr repositories in that ecr-repositories module using the same ecr Terraform module.
 
 
-# Using Terraform to Create the AWS EKS Infrastructure
+### Using Terraform to Create the AWS EKS Infrastructure
 
 You need an AWS account and access key and secret key stored in your .aws directory, of course. From now on we assume that you have configured an AWS profile and we refer to that AWS profile as YOUR-AWS-PROFILE.
 
@@ -98,7 +98,7 @@ AWS_PROFILE=YOUR-AWS-PROFILE terraform apply   # => Apply changes
 ```
 
 
-# Connecting to AWS EKS.
+### Connecting to AWS EKS.
 
 First you have to install [aws-cli](https://github.com/aws/aws-cli) and [aws-iam-authenticator](https://docs.aws.amazon.com/eks/latest/userguide/install-aws-iam-authenticator.html).
 
@@ -134,7 +134,7 @@ while true; do echo "*****************" ; AWS_PROFILE=YOUR-AWS-PROFILE kubectl g
 You should see the worker nodes getting created and starting to run. In my first try the worker nodes crashed.
 
 
-# Debugging Why the First Attempt to Create EKS Failed
+### Debugging Why the First Attempt to Create EKS Failed
 
 When checking the pods with describe and logs there was some info: Describe: "Back-off restarting failed container", Logs: "=====Starting amazon-k8s-agent =========== ERROR: logging before flag.Parse: W0116 18:25:39.734868      10 client_config.go:533] Neither --kubeconfig nor --master was specified.  Using the inClusterConfig.  This might not work."  Merry Christmas - nice to start googling the reason for this. First I created a key pair and configured the worker node configuration to use that key pair so that I would be able to ssh to worker node instances to see what's happening there. Ssh'ed to EC2 and then checked what's happening in the docker land: docker ps -a | wc -l => 41, Merry Christmas. 41, wtf? I checked that the current EKS version is 1.11. So, instead of getting the newest AMI with a filter like in the original example, I chose the newest AMI which had "1.11" in its name.
 
@@ -151,7 +151,7 @@ I fixed the tag issue but still same problems. Then I decided to follow one clou
 Actually, it was a kind of good thing that I didn't get the setup right the first time. Now I had to spend some serious cloud infra debugging time to figure out how the setup actually is supposed to work and not just blindly follow some black box example.
 
 
-# Observations
+### Observations
 
 **EKS worker node hassle.** The EKS cluster itself is easy to create, but the worker node hassle was really painful in the AWS EKS compared to Azure AKS (in which you didn't have to create any separate worker nodes).
 
@@ -159,7 +159,7 @@ Actually, it was a kind of good thing that I didn't get the setup right the firs
 
 
 
-# Links to External Documentation
+### Links to External Documentation
 
 - [Terraform AWS EKS Introduction](https://learn.hashicorp.com/terraform/aws/eks-intro)
 - [What is Aamazon EKS?](https://docs.aws.amazon.com/eks/latest/userguide/what-is-eks.html)
