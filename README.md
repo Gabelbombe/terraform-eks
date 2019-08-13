@@ -53,17 +53,17 @@ I'm using Terraform to create the needed AWS infrastructure.
 
 ## Terraform State
 
-For storing the Terraform state I'm using [S3](https://aws.amazon.com/s3/) [terraform backend](https://www.terraform.io/docs/backends/). See [env.tf](https://github.com/gabelbombe/aws/blob/master/simple-server-eks/terraform/envs/dev/env.tf) how to configure a Terraform backend. Basically there is no need to configure a backend in a single-user project but let's do it professionally to demonstrate Terraform best practices as well.
+For storing the Terraform state I'm using [S3](https://aws.amazon.com/s3/) [terraform backend](https://www.terraform.io/docs/backends/). See [env.tf](https://github.com/gabelbombe/aws/blob/master/terraform-eks/terraform/envs/dev/env.tf) how to configure a Terraform backend. Basically there is no need to configure a backend in a single-user project but let's do it professionally to demonstrate Terraform best practices as well.
 
 ## Terraform Project Structure
 
-I'm using a Terraform structure in which I have environments ([envs](https://github.com/gabelbombe/aws/tree/master/simple-server-eks/terraform/envs)) and [modules](https://github.com/gabelbombe/aws/tree/master/simple-server-eks/terraform/modules). Environments define the environments and they reuse the entities defined in the modules directory. Environment basically just injects the environment related variables to [env-def](https://github.com/gabelbombe/aws/tree/master/simple-server-eks/terraform/modules/env-def) which defines the actual modules to build the cloud infra.
+I'm using a Terraform structure in which I have environments ([envs](https://github.com/gabelbombe/aws/tree/master/terraform-eks/terraform/envs)) and [modules](https://github.com/gabelbombe/aws/tree/master/terraform-eks/terraform/modules). Environments define the environments and they reuse the entities defined in the modules directory. Environment basically just injects the environment related variables to [env-def](https://github.com/gabelbombe/aws/tree/master/terraform-eks/terraform/modules/env-def) which defines the actual modules to build the cloud infra.
 
 ## AWS Resources
 
 ### DynamoDB Tables
 
-I created module [dynamodb-tables](https://github.com/gabelbombe/aws/tree/master/simple-server-eks/terraform/modules/dynamodb-tables) to isolate the creation of the needed DynamoDB tables. This module uses module [dynamodb](https://github.com/gabelbombe/aws/tree/master/simple-server-eks/terraform/modules/dynamodb) to create all other tables except the product table which is a bit different with its global index and is therefore created separately.
+I created module [dynamodb-tables](https://github.com/gabelbombe/aws/tree/master/terraform-eks/terraform/modules/dynamodb-tables) to isolate the creation of the needed DynamoDB tables. This module uses module [dynamodb](https://github.com/gabelbombe/aws/tree/master/terraform-eks/terraform/modules/dynamodb) to create all other tables except the product table which is a bit different with its global index and is therefore created separately.
 
 ### VPC and Subnets
 
